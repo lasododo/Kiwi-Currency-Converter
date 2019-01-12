@@ -8,6 +8,7 @@ from termcolor import colored
 from bs4 import BeautifulSoup
 from itertools import islice
 
+
 JSON_OF_ALL_CURRENCIES = """http://data.fixer.io/api/latest?access_key=d281dc374b673b7c0976a6feeb27c2ca&format=1"""
 SHORTCUT_TO_SYMBOL = """https://gist.githubusercontent.com/Fluidbyte/2973986/raw/b0d1722b04b0a737aade2ce6e055263625a0b435/Common-Currency.json"""
 
@@ -17,6 +18,12 @@ class ErrorHandler(Exception):
 
 
 class FileUpdate:
+    """
+    :param filename -> the name of the file, we are going to update using second parameter
+    :param json_txt -> link to JSON, where we can find data we want to update
+    What it is doing? -> updates the files that are in backup file ( if any of those websites stop working, we have
+                         backup and we still can use it with outdated data
+    """
     def __init__(self, filename, json_txt):
         fp = urllib.request.urlopen(json_txt)
         my_bytes = fp.read()
@@ -29,6 +36,16 @@ class FileUpdate:
 
 
 class CurrencyConvert:
+    """
+        :param amount -> the amount that we want to convert
+        :param input_currency -> 3 letters / symbol of currency we are giving amount in ( example -> USD / $ )
+        :param output_currency -> 3 letters / symbol of currency we want to receive ( example -> USD / $ )
+        What it is doing? -> 1. It converts the currencies to 3 letter format
+                             2. It converts amount from any currency to EUR
+                             3. Checks if output is None
+                                3.1 If output is None, it returns JSON that includes all outputs
+                                3.2 If output is Not None, it returns JSON that includes output currency
+    """
     def __init__(self, amount, input_currency, output_currency=None):
         self.amount_default = amount
         self.amount = amount
@@ -115,4 +132,4 @@ if __name__ == "__main__":
 
     currency = CurrencyConvert(args.amount, args.input_currency.upper(), args.output_currency)
     json_text = currency.json_it()
-    print(json.dumps(json_text, indent=10))
+    print(json.dumps(json_text, indent=4))
